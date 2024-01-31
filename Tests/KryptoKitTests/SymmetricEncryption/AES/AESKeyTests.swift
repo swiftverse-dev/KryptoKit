@@ -34,5 +34,44 @@ final class AESKeyTests: XCTestCase {
         }
         XCTAssertEqual(Set(keys).count, keys.count)
     }
+    
+    func test_k128_generateDerivedKeyFromPassowordWithSizeOf128Bit() {
+        let password = "A Password"
+        let salt = Data("12345678".utf8)
+        XCTAssert(salt.count == 8)
+        
+        let keys = (0..<10).map{ _ in SUT.k128(derivedFrom: password, salt: salt) }
+        keys.forEach{
+            dump($0)
+            XCTAssertEqual($0.size, SUT.aes128)
+        }
+        XCTAssertEqual(Set(keys).count, 1)
+    }
+    
+    func test_k192_generateDerivedKeyFromPassowordWithSizeOf192Bit() {
+        let password = "A Password"
+        let salt = Data("12345678".utf8)
+        XCTAssert(salt.count == 8)
+        
+        let keys = (0..<10).map{ _ in SUT.k128(derivedFrom: password, salt: salt) }
+        keys.forEach{
+            dump($0)
+            XCTAssertEqual($0.size, SUT.aes128)
+        }
+        XCTAssertEqual(Set(keys).count, 1)
+    }
+    
+    func test_k256_generateDerivedKeyFromPassowordWithSizeOf256Bit() {
+        let password = "A Password"
+        let salt = Data("12345678".utf8)
+        XCTAssert(salt.count == 8)
+        
+        let keys = (0..<10).map{ _ in SUT.k128(derivedFrom: password, salt: salt) }
+        keys.forEach{
+            dump($0)
+            XCTAssertEqual($0.size, SUT.aes128)
+        }
+        XCTAssertEqual(Set(keys).count, 1)
+    }
 
 }

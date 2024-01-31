@@ -26,34 +26,53 @@ public extension AES {
 
 
 public extension AES.Key {
-    static func k128() -> Self {
-        Self(data: random(byteSize: aes128))
+    static func k128(derivedFrom password: String? = nil, salt: Data? = nil) -> Self {
+        if let password{
+            return Self(data: fromPassword(password, salt: salt, byteSize: aes128))
+        }
+        return Self(data: random(byteSize: aes128))
     }
     
-    static func k192() -> Self {
-        Self(data: random(byteSize: aes192))
+    static func k192(derivedFrom password: String? = nil, salt: Data? = nil) -> Self {
+        if let password{
+            return Self(data: fromPassword(password, salt: salt, byteSize: aes192))
+        }
+        return Self(data: random(byteSize: aes192))
     }
     
-    static func k256() -> Self {
-        Self(data: random(byteSize: aes256))
+    static func k256(derivedFrom password: String? = nil, salt: Data? = nil) -> Self {
+        if let password{
+            return Self(data: fromPassword(password, salt: salt, byteSize: aes256))
+        }
+        return Self(data: random(byteSize: aes256))
     }
 }
 
 
 private extension AES.Key {
     static func random(byteSize: Int) -> Data {
-        var password = try! SecureRandom.generate(byteSize: UInt(byteSize))
-        var salt = try! SecureRandom.generate(byteSize: 8)
-        let byteSize = Int(byteSize)
+        let password = try! SecureRandom.generate(byteSize: UInt(byteSize))
+        let salt = try! SecureRandom.generate(byteSize: 8)
+        
+        return deriveKeyFrom(password: password, passwordCount: \.count, salt: salt, byteSize: byteSize)
+    }
+    
+    static func fromPassword(_ password: String, salt: Data?, byteSize: Int) -> Data {
+        let salt = try! (salt ?? SecureRandom.generate(byteSize: 8))
+        return deriveKeyFrom(password: password, passwordCount: \.count, salt: salt, byteSize: byteSize)
+    }
+    
+    static func deriveKeyFrom<Password>(password: Password, passwordCount: KeyPath<Password, Int>, salt: Data, byteSize: Int) -> Data {
+        var password = password
+        var salt = salt
         
         var derivedKey = [UInt8](repeating: 0, count: byteSize)
-        let algo = CCPBKDFAlgorithm(kCCPBKDF2)
         withUnsafeBytes(of: &password) { [password] passwordBytes in
             withUnsafeBytes(of: &salt) { [salt] saltBytes in
                 CCKeyDerivationPBKDF(
-                    algo,
+                    CCPBKDFAlgorithm(kCCPBKDF2),
                     passwordBytes.assumingMemoryBound(to: CChar.self).baseAddress,
-                    password.count,
+                    password[keyPath: passwordCount],
                     saltBytes.assumingMemoryBound(to: UInt8.self).baseAddress,
                     salt.count,
                     CCPBKDFAlgorithm(kCCPRFHmacAlgSHA1),
@@ -66,9 +85,5 @@ private extension AES.Key {
         }
         
         return Data(bytes: derivedKey, count: byteSize)
-    }
-    
-    static func fromPassword(_ password: String) throws -> Data {
-        Data()
     }
 }
