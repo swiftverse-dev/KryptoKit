@@ -1,30 +1,25 @@
 //
-//  AES+ECB.swift
+//  AES+CBC.swift
 //
 //
 //  Created by Lorenzo Limoli on 01/02/24.
 //
 
 import Foundation
-import CryptoKit
 
 public extension AES {
-    struct ECB {
-        let padding: Padding
-        
-        public init(padding: Padding = .pkcs7) {
-            self.padding = padding
-        }
+    struct CBC {
+        public init() {}
     }
 }
 
-extension AES.ECB: SymmetricEncrypter {
+extension AES.CBC: SymmetricEncrypter {
+    
     public func seal(plainText: Data, using key: AES.Key) throws -> any SealedBox<AES.Key> {
-        try SBox(plainText: plainText, key: key, padding: padding)
+        try SBox(plainText: plainText, key: key)
     }
     
     public func sealedBox(fromCipherText cipherText: Data) -> any SealedBox<AES.Key> {
         SBox(cipherText: cipherText)
     }
 }
-

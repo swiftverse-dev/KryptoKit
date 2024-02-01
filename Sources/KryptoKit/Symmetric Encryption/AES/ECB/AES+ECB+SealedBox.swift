@@ -51,13 +51,3 @@ extension AES.ECB.SBox {
 private extension AES.ECB.Padding {
     var ccPadding: CCPadding { CCPadding( self == .none ? ccNoPadding : ccPKCS7Padding ) }
 }
-
-private extension AES.Error {
-    static func statusError(_ error: Error) -> Self {
-        if let statusErr = error as? CommonCryptoEncrypter.StatusError {
-            statusErr.code == -4303 ? Self.alignmentError : Self.statusError(code: statusErr.code)
-        }else {
-            Self.statusError(code: -1)
-        }
-    }
-}
