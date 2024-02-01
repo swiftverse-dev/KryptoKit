@@ -9,10 +9,12 @@ import Foundation
 import CommonCrypto
 
 public extension AES {
-    struct Key: Equatable, Hashable, ContiguousBytes {
-        static let aes128 = kCCKeySizeAES128
-        static let aes192 = kCCKeySizeAES192
-        static let aes256 = kCCKeySizeAES256
+    struct Key: Equatable, Hashable, SymmetricKey {
+        public typealias Algorithm = AES
+        
+        static var aes128: Int { kCCKeySizeAES128 }
+        static var aes192: Int { kCCKeySizeAES192 }
+        static var aes256: Int { kCCKeySizeAES256 }
         
         public let data: Data
         public var size: Int { data.count }
@@ -90,4 +92,8 @@ private extension AES.Key {
         
         return Data(bytes: derivedKey, count: byteSize)
     }
+}
+
+extension AES.Key: ContiguousBytes {
+    
 }

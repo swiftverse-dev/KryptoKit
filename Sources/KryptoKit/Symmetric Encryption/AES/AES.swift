@@ -7,4 +7,6 @@
 
 import Foundation
 
-public enum AES {}
+public enum AES: SymmetricAlgorithm {
+    static var blockSize: Int { 16 /* 128 bit */ }
+}
