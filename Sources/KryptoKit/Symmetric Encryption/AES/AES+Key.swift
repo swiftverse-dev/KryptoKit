@@ -9,7 +9,7 @@ import Foundation
 import CommonCrypto
 
 public extension AES {
-    struct Key: Equatable, Hashable {
+    struct Key: Equatable, Hashable, ContiguousBytes {
         static let aes128 = kCCKeySizeAES128
         static let aes192 = kCCKeySizeAES192
         static let aes256 = kCCKeySizeAES256
@@ -20,6 +20,10 @@ public extension AES {
         
         fileprivate init(data: Data) {
             self.data = data
+        }
+        
+        public func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
+            try data.withUnsafeBytes(body)
         }
     }
 }
@@ -67,8 +71,8 @@ private extension AES.Key {
         var salt = salt
         
         var derivedKey = [UInt8](repeating: 0, count: byteSize)
-        withUnsafeBytes(of: &password) { [password] passwordBytes in
-            withUnsafeBytes(of: &salt) { [salt] saltBytes in
+        Swift.withUnsafeBytes(of: &password) { [password] passwordBytes in
+            Swift.withUnsafeBytes(of: &salt) { [salt] saltBytes in
                 CCKeyDerivationPBKDF(
                     CCPBKDFAlgorithm(kCCPBKDF2),
                     passwordBytes.assumingMemoryBound(to: CChar.self).baseAddress,
