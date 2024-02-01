@@ -37,9 +37,9 @@ final class SecureRandomTests: XCTestCase {
 }
 
 private extension SecureRandomTests {
-    func expect(toThrow expectedError: SUT.Error, during dataGenerator: () throws -> Data, file: StaticString = #filePath, line: UInt = #line) {
+    func expect(toThrow expectedError: SUT.Error, during action: () throws -> Void, file: StaticString = #filePath, line: UInt = #line) {
         do{
-            let _ = try dataGenerator()
+            try action()
             XCTFail("Expected to throw \(expectedError), succeeded instead", file: file, line: line)
         } catch let error as SUT.Error {
             XCTAssertEqual(error, expectedError)

@@ -30,6 +30,31 @@ public extension AES {
     }
 }
 
+public extension AES.Key {
+    static func k128(key: Data) throws -> Self {
+        let keySize = key.count
+        if keySize != Self.aes128 {
+            throw AES.Error.badKeySize
+        }
+        return Self(data: key)
+    }
+    
+    static func k192(key: Data) throws -> Self {
+        let keySize = key.count
+        if keySize != Self.aes192 {
+            throw AES.Error.badKeySize
+        }
+        return Self(data: key)
+    }
+    
+    static func k256(key: Data) throws -> Self {
+        let keySize = key.count
+        if keySize != Self.aes256 {
+            throw AES.Error.badKeySize
+        }
+        return Self(data: key)
+    }
+}
 
 public extension AES.Key {
     static func k128(derivedFrom password: String? = nil, salt: Data? = nil) -> Self {
@@ -92,8 +117,4 @@ private extension AES.Key {
         
         return Data(bytes: derivedKey, count: byteSize)
     }
-}
-
-extension AES.Key: ContiguousBytes {
-    
 }

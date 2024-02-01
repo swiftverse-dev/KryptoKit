@@ -11,6 +11,34 @@ import XCTest
 final class AESKeyTests: XCTestCase {
     typealias SUT = AES.Key
     
+    func test_k128_k192_k256_throwsBadKeySizeErrorIfKeyDoNotMatchLen() throws {
+        let wrongKeys = try [8, 16, 64, 512, 80, 1024].map(SecureRandom.generate(bitSize:))
+        for wrongKey in wrongKeys {
+            expect(toThrow: .badKeySize) {
+                _ = try SUT.k128(key: wrongKey)
+            }
+            
+            expect(toThrow: .badKeySize) {
+                _ = try SUT.k192(key: wrongKey)
+            }
+            
+            expect(toThrow: .badKeySize) {
+                _ = try SUT.k256(key: wrongKey)
+            }
+        }
+    }
+    
+    func test_k128_k192_k256_createSuccessfullyTheCorrespondingKey() throws {
+        let k128 = try SecureRandom.generate(bitSize: 128)
+        try XCTAssertEqual(SUT.k128(key: k128).data, k128)
+        
+        let k192 = try SecureRandom.generate(bitSize: 192)
+        try XCTAssertEqual(SUT.k192(key: k192).data, k192)
+        
+        let k256 = try SecureRandom.generate(bitSize: 256)
+        try XCTAssertEqual(SUT.k256(key: k256).data, k256)
+    }
+    
     func test_k128_generateRandomKeyWithSizeOf128Bit() {
         let keys = (0..<10).map{ _ in SUT.k128() }
         keys.forEach{
@@ -74,4 +102,17 @@ final class AESKeyTests: XCTestCase {
         XCTAssertEqual(Set(keys).count, 1)
     }
 
+}
+
+private extension AESKeyTests {
+    func expect(toThrow expectedError: AES.Error, during action: () throws -> Void, file: StaticString = #filePath, line: UInt = #line) {
+        do{
+            try action()
+            XCTFail("Expected to throw \(expectedError), succeeded instead", file: file, line: line)
+        } catch let error as AES.Error {
+            XCTAssertEqual(error, expectedError)
+        } catch {
+            XCTFail("Expected to throw \(expectedError), got \(error) instead", file: file, line: line)
+        }
+    }
 }
