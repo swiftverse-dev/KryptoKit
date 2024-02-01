@@ -19,50 +19,56 @@ final class AES_ECBTests: AESTests {
     }
     
     func test_seal_createsSealedBoxWithCorrectCipherText() throws {
-        let sut128 = makeSUT()
-        let sbox128 = try sut128.seal(plainText: plainText, using: k128)
+        let sut = makeSUT()
+        
+        let sbox128 = try sut.seal(plainText: plainText, using: k128)
         XCTAssertEqual(sbox128.cipherText, cipherText128)
         
-        let sut192 = makeSUT()
-        let sbox192 = try sut192.seal(plainText: plainText, using: k192)
+        let sbox192 = try sut.seal(plainText: plainText, using: k192)
         XCTAssertEqual(sbox192.cipherText, cipherText192)
         
-        let sut256 = makeSUT()
-        let sbox256 = try sut256.seal(plainText: plainText, using: k256)
+        let sbox256 = try sut.seal(plainText: plainText, using: k256)
         XCTAssertEqual(sbox256.cipherText, cipherText256)
     }
     
     func test_openSealedBox_extractsTheCorrectPlainText() throws {
-        let sut128 = makeSUT()
-        let sbox128 = sut128.sealedBox(fromCipherText: cipherText128)
+        let sut = makeSUT()
+        
+        let sbox128 = sut.sealedBox(fromCipherText: cipherText128)
         try XCTAssertEqual(sbox128.open(using: k128), plainText)
         
-        let sut192 = makeSUT()
-        let sbox92 = sut192.sealedBox(fromCipherText: cipherText192)
+        let sbox92 = sut.sealedBox(fromCipherText: cipherText192)
         try XCTAssertEqual(sbox92.open(using: k192), plainText)
         
-        let sut256 = makeSUT()
-        let sbox256 = sut256.sealedBox(fromCipherText: cipherText256)
+        let sbox256 = sut.sealedBox(fromCipherText: cipherText256)
         try XCTAssertEqual(sbox256.open(using: k256), plainText)
     }
     
     func test_seal_throwsAlignmentErrorWhenNoPaddingAndIfPlainTextIsNotMultipleOfBlockSize() {
         let plainTextNotMultipleOf128 = plainText
         
-        let sut128 = makeSUT(padding: .none)
+        let sut = makeSUT(padding: .none)
+        
         expect(toThrow: .alignmentError) {
-            _ = try sut128.seal(plainText: plainTextNotMultipleOf128, using: k128)
+            _ = try sut.seal(plainText: plainTextNotMultipleOf128, using: k128)
         }
         
-        let sut192 = makeSUT(padding: .none)
         expect(toThrow: .alignmentError) {
-            _ = try sut192.seal(plainText: plainTextNotMultipleOf128, using: k192)
+            _ = try sut.seal(plainText: plainTextNotMultipleOf128, using: k192)
         }
         
-        let sut256 = makeSUT(padding: .none)
         expect(toThrow: .alignmentError) {
-            _ = try sut256.seal(plainText: plainTextNotMultipleOf128, using: k256)
+            _ = try sut.seal(plainText: plainTextNotMultipleOf128, using: k256)
         }
+    }
+    
+    func test_seal_createsSealedBoxSuccessfullyWhenPaddingNoneAndPlainTextIsMultipleOf128() {
+        let plainTextMultipleOf128 = Data("1234567890123456".utf8)
+        
+        let sut = makeSUT(padding: .none)
+        XCTAssertNoThrow(try sut.seal(plainText: plainTextMultipleOf128, using: k128))
+        XCTAssertNoThrow(try sut.seal(plainText: plainTextMultipleOf128, using: k192))
+        XCTAssertNoThrow(try sut.seal(plainText: plainTextMultipleOf128, using: k256))
     }
 }
 
