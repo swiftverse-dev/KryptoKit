@@ -8,7 +8,7 @@
 import XCTest
 @testable import KryptoKit
 
-final class AESKeyTests: XCTestCase {
+final class AESKeyTests: AESTests {
     typealias SUT = AES.Key
     
     func test_k128_k192_k256_throwsBadKeySizeErrorIfKeyDoNotMatchLen() throws {
@@ -104,15 +104,3 @@ final class AESKeyTests: XCTestCase {
 
 }
 
-private extension AESKeyTests {
-    func expect(toThrow expectedError: AES.Error, during action: () throws -> Void, file: StaticString = #filePath, line: UInt = #line) {
-        do{
-            try action()
-            XCTFail("Expected to throw \(expectedError), succeeded instead", file: file, line: line)
-        } catch let error as AES.Error {
-            XCTAssertEqual(error, expectedError)
-        } catch {
-            XCTFail("Expected to throw \(expectedError), got \(error) instead", file: file, line: line)
-        }
-    }
-}

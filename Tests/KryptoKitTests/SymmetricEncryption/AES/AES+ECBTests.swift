@@ -8,7 +8,7 @@
 import XCTest
 import KryptoKit
 
-final class AES_ECBTests: XCTestCase {
+final class AES_ECBTests: AESTests {
     typealias SUT = AES.ECB
     
     func test_sealedBoxFromCipherText_createSealedBoxWithTheSameCipherText() throws {
@@ -44,6 +44,25 @@ final class AES_ECBTests: XCTestCase {
         let sut256 = makeSUT()
         let sbox256 = sut256.sealedBox(fromCipherText: cipherText256)
         try XCTAssertEqual(sbox256.open(using: k256), plainText)
+    }
+    
+    func test_seal_throwsAlignmentErrorWhenNoPaddingAndIfPlainTextIsNotMultipleOfBlockSize() {
+        let plainTextNotMultipleOf128 = plainText
+        
+        let sut128 = makeSUT(padding: .none)
+        expect(toThrow: .alignmentError) {
+            _ = try sut128.seal(plainText: plainTextNotMultipleOf128, using: k128)
+        }
+        
+        let sut192 = makeSUT(padding: .none)
+        expect(toThrow: .alignmentError) {
+            _ = try sut192.seal(plainText: plainTextNotMultipleOf128, using: k192)
+        }
+        
+        let sut256 = makeSUT(padding: .none)
+        expect(toThrow: .alignmentError) {
+            _ = try sut256.seal(plainText: plainTextNotMultipleOf128, using: k256)
+        }
     }
 }
 
