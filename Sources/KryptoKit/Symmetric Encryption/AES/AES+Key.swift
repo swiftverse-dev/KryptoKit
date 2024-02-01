@@ -57,6 +57,20 @@ public extension AES.Key {
 }
 
 public extension AES.Key {
+    static func k128(key: String) throws -> Self {
+        try k128(key: Data(key.utf8))
+    }
+    
+    static func k192(key: String) throws -> Self {
+        try k192(key: Data(key.utf8))
+    }
+    
+    static func k256(key: String) throws -> Self {
+        try k256(key: Data(key.utf8))
+    }
+}
+
+public extension AES.Key {
     static func k128(derivedFrom password: String? = nil, salt: Data? = nil) -> Self {
         if let password{
             return Self(data: fromPassword(password, salt: salt, byteSize: aes128))
