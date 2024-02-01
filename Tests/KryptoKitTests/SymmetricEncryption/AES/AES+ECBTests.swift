@@ -10,25 +10,28 @@ import KryptoKit
 
 final class AES_ECBTests: AESTests {
     typealias SUT = AES.ECB
+
+    override var cipherText128: Data {
+        Data(base64Encoded: "t8vP+hOjSj3a/nK0gzk+IhT8kfF/m1wLdBCnEEXIyY8=")!
+    }
+    
+    override var cipherText192: Data {
+        Data(base64Encoded: "rnvWu25YDHHUZ0PVfSIch9UhnDTWb2AE6rkCGiEZ4pU=")!
+    }
+    
+    override var cipherText256: Data {
+        Data(base64Encoded: "kkHEVgnmehhIglF9AZh1wUJYviJcDMCFr+Wp3IkyHFA=")!
+    }
+    
     
     func test_sealedBoxFromCipherText_createSealedBoxWithTheSameCipherText() throws {
         let sut = makeSUT()
-        let cipherText = Data("cipherText".utf8)
-        let sbox = sut.sealedBox(fromCipherText: cipherText)
-        XCTAssertEqual(sbox.cipherText, cipherText)
+        try assert_sealedBoxFromCipherText_createSealedBoxWithTheSameCipherText(sut: sut)
     }
     
     func test_seal_createsSealedBoxWithCorrectCipherText() throws {
         let sut = makeSUT()
-        
-        let sbox128 = try sut.seal(plainText: plainText, using: k128)
-        XCTAssertEqual(sbox128.cipherText, cipherText128)
-        
-        let sbox192 = try sut.seal(plainText: plainText, using: k192)
-        XCTAssertEqual(sbox192.cipherText, cipherText192)
-        
-        let sbox256 = try sut.seal(plainText: plainText, using: k256)
-        XCTAssertEqual(sbox256.cipherText, cipherText256)
+        try assert_seal_createsSealedBoxWithCorrectCipherText(sut: sut)
     }
     
     func test_seal_throwsAlignmentErrorWhenNoPaddingAndIfPlainTextIsNotMultipleOfBlockSize() {
@@ -60,52 +63,16 @@ final class AES_ECBTests: AESTests {
     
     func test_openSealedBox_extractsTheCorrectPlainText() throws {
         let sut = makeSUT()
-        
-        let sbox128 = sut.sealedBox(fromCipherText: cipherText128)
-        try XCTAssertEqual(sbox128.open(using: k128), plainText)
-        
-        let sbox92 = sut.sealedBox(fromCipherText: cipherText192)
-        try XCTAssertEqual(sbox92.open(using: k192), plainText)
-        
-        let sbox256 = sut.sealedBox(fromCipherText: cipherText256)
-        try XCTAssertEqual(sbox256.open(using: k256), plainText)
+        try assert_openSealedBox_extractsTheCorrectPlainText(sut: sut)
     }
     
     func test_openSealedBox_returnsTheSamePlainTextUsedToCreateTheBox() throws {
         let sut = makeSUT()
-        
-        let sbox128 = try sut.seal(plainText: plainText, using: k128)
-        try XCTAssertEqual(sbox128.open(using: k128), plainText)
-        
-        let sbox192 = try sut.seal(plainText: plainText, using: k192)
-        try XCTAssertEqual(sbox192.open(using: k192), plainText)
-        
-        let sbox256 = try sut.seal(plainText: plainText, using: k256)
-        try XCTAssertEqual(sbox256.open(using: k256), plainText)
+        try assert_openSealedBox_returnsTheSamePlainTextUsedToCreateTheBox(sut: sut)
     }
 }
 
 private extension AES_ECBTests {
-    var plainText: Data{
-        Data("This is a secret message".utf8)
-    }
-    
-    var cipherText128: Data {
-        Data(base64Encoded: "t8vP+hOjSj3a/nK0gzk+IhT8kfF/m1wLdBCnEEXIyY8=")!
-    }
-    
-    var cipherText192: Data {
-        Data(base64Encoded: "rnvWu25YDHHUZ0PVfSIch9UhnDTWb2AE6rkCGiEZ4pU=")!
-    }
-    
-    var cipherText256: Data {
-        Data(base64Encoded: "kkHEVgnmehhIglF9AZh1wUJYviJcDMCFr+Wp3IkyHFA=")!
-    }
-    
-    var k128: AES.Key { try! AES.Key.k128(key: "1234567890123456") }
-    var k192: AES.Key { try! AES.Key.k192(key: "123456789012345612345678") }
-    var k256: AES.Key { try! AES.Key.k256(key: "12345678901234561234567890123456") }
-    
     func makeSUT(padding: SUT.Padding = .pkcs7) -> SUT {
         return SUT(padding: padding)
     }
