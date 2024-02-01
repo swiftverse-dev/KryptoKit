@@ -22,7 +22,10 @@ public extension AES.ECB{
         init(plainText: Data, key: AES.Key, padding: Padding = .pkcs7) throws {
             self.padding = padding
             let enc = Self.encrypter(padding: padding)
-            self.cipherText = try enc.encrypt(plainData: plainText, using: key.data)
+            self.cipherText = try enc.encrypt(
+                plainData: plainText,
+                using: key.data
+            ) ~> AES.Error.statusError
         }
         
         public func open(using key: AES.Key) throws -> Data {
@@ -52,7 +55,7 @@ private extension AES.ECB.Padding {
 private extension AES.Error {
     static func statusError(_ error: Error) -> Self {
         if let statusErr = error as? CommonCryptoEncrypter.StatusError {
-            Self.statusError(code: statusErr.code)
+            statusErr.code == -4303 ? Self.alignmentError : Self.statusError(code: statusErr.code)
         }else {
             Self.statusError(code: -1)
         }

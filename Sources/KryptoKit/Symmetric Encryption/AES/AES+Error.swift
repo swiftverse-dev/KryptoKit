@@ -10,6 +10,7 @@ import Foundation
 public extension AES {
     enum Error: Swift.Error, Equatable {
         case badKeySize
+        case alignmentError
         case statusError(code: Int)
     }
 }

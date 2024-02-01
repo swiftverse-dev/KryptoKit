@@ -18,21 +18,18 @@ final class CommonCryptoEncrypter {
         algo: CCAlgorithm,
         mode: CCMode,
         iv: Data? = nil,
-        padding: CCPadding = CCPadding(ccPKCS7Padding),
-        options: CCModeOptions = CCModeOptions(kCCOptionPKCS7Padding)
+        padding: CCPadding = CCPadding(ccPKCS7Padding)
     ) {
         self._algo = algo
         self._mode = mode
         self._iv = iv
         self._padding = padding
-        self._options = options
     }
     
     private let _algo: CCAlgorithm
     private let _mode: CCMode
     private let _iv: Data?
     private let _padding: CCPadding
-    private let _options: CCModeOptions
     
     func encrypt(plainData: Data, using key: Data) throws -> Data {
         try _applyOperation(data: plainData, operation: CCOperation(kCCEncrypt), key: key)
@@ -70,7 +67,7 @@ final class CommonCryptoEncrypter {
             nil,
             0,
             0,
-            self._options,
+            CCModeOptions(kCCOptionPKCS7Padding), // useless by doc
             &cryptor
         )
         
