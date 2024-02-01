@@ -31,19 +31,6 @@ final class AES_ECBTests: AESTests {
         XCTAssertEqual(sbox256.cipherText, cipherText256)
     }
     
-    func test_openSealedBox_extractsTheCorrectPlainText() throws {
-        let sut = makeSUT()
-        
-        let sbox128 = sut.sealedBox(fromCipherText: cipherText128)
-        try XCTAssertEqual(sbox128.open(using: k128), plainText)
-        
-        let sbox92 = sut.sealedBox(fromCipherText: cipherText192)
-        try XCTAssertEqual(sbox92.open(using: k192), plainText)
-        
-        let sbox256 = sut.sealedBox(fromCipherText: cipherText256)
-        try XCTAssertEqual(sbox256.open(using: k256), plainText)
-    }
-    
     func test_seal_throwsAlignmentErrorWhenNoPaddingAndIfPlainTextIsNotMultipleOfBlockSize() {
         let plainTextNotMultipleOf128 = plainText
         
@@ -69,6 +56,32 @@ final class AES_ECBTests: AESTests {
         XCTAssertNoThrow(try sut.seal(plainText: plainTextMultipleOf128, using: k128))
         XCTAssertNoThrow(try sut.seal(plainText: plainTextMultipleOf128, using: k192))
         XCTAssertNoThrow(try sut.seal(plainText: plainTextMultipleOf128, using: k256))
+    }
+    
+    func test_openSealedBox_extractsTheCorrectPlainText() throws {
+        let sut = makeSUT()
+        
+        let sbox128 = sut.sealedBox(fromCipherText: cipherText128)
+        try XCTAssertEqual(sbox128.open(using: k128), plainText)
+        
+        let sbox92 = sut.sealedBox(fromCipherText: cipherText192)
+        try XCTAssertEqual(sbox92.open(using: k192), plainText)
+        
+        let sbox256 = sut.sealedBox(fromCipherText: cipherText256)
+        try XCTAssertEqual(sbox256.open(using: k256), plainText)
+    }
+    
+    func test_openSealedBox_returnsTheSamePlainTextUsedToCreateTheBox() throws {
+        let sut = makeSUT()
+        
+        let sbox128 = try sut.seal(plainText: plainText, using: k128)
+        try XCTAssertEqual(sbox128.open(using: k128), plainText)
+        
+        let sbox192 = try sut.seal(plainText: plainText, using: k192)
+        try XCTAssertEqual(sbox192.open(using: k192), plainText)
+        
+        let sbox256 = try sut.seal(plainText: plainText, using: k256)
+        try XCTAssertEqual(sbox256.open(using: k256), plainText)
     }
 }
 
