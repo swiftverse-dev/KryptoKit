@@ -27,7 +27,7 @@ public extension AES.ECB{
         
         public func open(using key: AES.Key) throws -> Data {
             let enc = Self.encrypter(padding: padding)
-            return try enc.decrypt(encryptedData: cipherText, using: key.data)
+            return try enc.decrypt(encryptedData: cipherText, using: key.data) ~> AES.Error.statusError
         }
     }
 }
@@ -47,4 +47,14 @@ extension AES.ECB.SBox {
 
 private extension AES.ECB.Padding {
     var ccPadding: CCPadding { CCPadding( self == .none ? ccNoPadding : ccPKCS7Padding ) }
+}
+
+private extension AES.Error {
+    static func statusError(_ error: Error) -> Self {
+        if let statusErr = error as? CommonCryptoEncrypter.StatusError {
+            Self.statusError(code: statusErr.code)
+        }else {
+            Self.statusError(code: -1)
+        }
+    }
 }

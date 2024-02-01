@@ -10,11 +10,9 @@ import CryptoKit
 
 public extension AES {
     struct ECB {
-        let key: AES.Key
         let padding: Padding
         
-        public init(key: AES.Key, padding: Padding) {
-            self.key = key
+        public init(padding: Padding = .pkcs7) {
             self.padding = padding
         }
     }
@@ -23,12 +21,11 @@ public extension AES {
 extension AES.ECB: SymmetricEncrypter {
     public typealias Key = AES.Key
     
-    
-    public func seal(plainText: Data) throws -> any SealedBox<Key> {
-        try SBox(plainText: plainText, key: key)
+    public func seal(plainText: Data, using key: Key) throws -> SBox {
+        try SBox(plainText: plainText, key: key, padding: padding)
     }
     
-    public func sealedBox(fromCipherText cipherText: Data) -> any SealedBox<Key> {
+    public func sealedBox(fromCipherText cipherText: Data) -> SBox {
         SBox(cipherText: cipherText)
     }
 }
