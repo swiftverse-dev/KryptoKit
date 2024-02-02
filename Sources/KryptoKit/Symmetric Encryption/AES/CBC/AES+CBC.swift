@@ -9,7 +9,7 @@ import Foundation
 
 public extension AES {
     struct CBC {
-        let iv: IV
+        private let iv: IV
         
         public init(iv: Data) throws {
             self.iv = try IV(data: iv)

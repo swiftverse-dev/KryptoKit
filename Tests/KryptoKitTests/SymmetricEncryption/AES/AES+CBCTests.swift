@@ -27,11 +27,11 @@ final class AES_CBCTests: AESTests {
         let smallerIV = Data("1234567890".utf8)
         let biggerIV = Data("12345678901234567890".utf8)
         
-        expect(toThrow: .badIvSize) {
+        expect(toThrow: .badParameterSize) {
             _ = try SUT(iv: smallerIV)
         }
         
-        expect(toThrow: .badIvSize) {
+        expect(toThrow: .badParameterSize) {
             _ = try SUT(iv: biggerIV)
         }
     }

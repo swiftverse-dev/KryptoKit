@@ -10,7 +10,7 @@ import CryptoKit
 
 public extension AES {
     struct ECB {
-        let padding: Padding
+        private let padding: Padding
         
         public init(padding: Padding = .pkcs7) {
             self.padding = padding

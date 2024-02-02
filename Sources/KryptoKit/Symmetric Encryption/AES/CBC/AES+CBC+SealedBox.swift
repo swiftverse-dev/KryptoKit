@@ -11,7 +11,7 @@ import CommonCrypto
 public extension AES.CBC {
     struct SBox: SealedBox {
         public let cipherText: Data
-        public let iv: IV
+        private let iv: IV
         
         init(cipherText: Data, iv: IV) {
             self.cipherText = cipherText
