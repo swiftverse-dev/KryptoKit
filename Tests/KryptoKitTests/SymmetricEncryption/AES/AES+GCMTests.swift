@@ -22,6 +22,15 @@ final class AES_GCMTests: AESTests {
     override var cipherText256: Data {
         Data(base64Encoded: "OVLQ89+R5zF8c6SRQPSQfJCJQUgm+hcAkqLhFZKFT+Dgng5gSZKZ/w==")!
     }
+    
+    func test_init_throwsBadParameterSizeErrorForWrongNonceSize() {
+        let wrongNonces = ["123", "12345678901"].map{ Data($0.utf8) }
+        wrongNonces.forEach{ wrongNonce in
+            expect(toThrow: .badParameterSize) {
+                _ = try SUT(nonce: wrongNonce)
+            }
+        }
+    }
 
     func test_sealedBoxFromCipherText_createSealedBoxWithTheSameCipherText() throws {
         let sut = makeSUT()
