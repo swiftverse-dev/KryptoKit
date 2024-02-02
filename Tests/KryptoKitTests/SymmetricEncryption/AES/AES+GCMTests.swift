@@ -31,6 +31,13 @@ final class AES_GCMTests: AESTests {
             }
         }
     }
+    
+    func test_init_successfullyInitSUTForCorrectNonceSizes() throws {
+        let correctNonces = ["123456789012", "1234567890123", "123456789012346", "1234567890123467890"].map{ Data($0.utf8) }
+        try correctNonces.forEach{ correctNonce in
+            XCTAssertNoThrow(try SUT(nonce: correctNonce))
+        }
+    }
 
     func test_sealedBoxFromCipherText_createSealedBoxWithTheSameCipherText() throws {
         let sut = makeSUT()
