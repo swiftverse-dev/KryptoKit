@@ -14,7 +14,7 @@ public extension AES.CBC {
         public init(data: Data) throws {
             let blockSize = data.count
             if blockSize != AES.blockSize {
-                throw AES.Error.badKeySize
+                throw AES.Error.badIvSize
             }
             self.data = data
         }

@@ -23,6 +23,23 @@ final class AES_CBCTests: AESTests {
         Data(base64Encoded: "GNUPH5ksym86ty6gofTWhpi3RFAGovmapfiGRXpxcYE=")!
     }
     
+    func test_init_throwsBadIvSizeForIVNotMatchingAESblockSize() {
+        let smallerIV = Data("1234567890".utf8)
+        let biggerIV = Data("12345678901234567890".utf8)
+        
+        expect(toThrow: .badIvSize) {
+            _ = try SUT(iv: smallerIV)
+        }
+        
+        expect(toThrow: .badIvSize) {
+            _ = try SUT(iv: biggerIV)
+        }
+    }
+    
+    func test_init_initializesSuccessfullySUTForIvWith128BitSize() throws {
+        let correctIV = iv.data
+        XCTAssertNoThrow(try SUT(iv: correctIV))
+    }
     
     func test_sealedBoxFromCipherText_createSealedBoxWithTheSameCipherText() throws {
         let sut = makeSUT()
