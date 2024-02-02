@@ -46,5 +46,6 @@ final class AES_CBCTests: AESTests {
 }
 
 private extension AES_CBCTests {
-    func makeSUT() -> SUT { SUT() }
+    var iv: SUT.IV { try! SUT.IV(data: Data("1234567890123456".utf8)) }
+    func makeSUT(iv: SUT.IV? = nil) -> SUT { SUT(iv: iv ?? self.iv) }
 }
