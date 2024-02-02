@@ -30,4 +30,8 @@ extension AES.GCM: SymmetricEncrypter {
     public func sealedBox(fromCipherText cipherText: Data) -> any SealedBox<AES.Key> {
         SBox(cipherText: cipherText, nonce: nonce)
     }
+    
+    public func sealedBox(encryptedText: Data, tag: Data) -> SBox {
+        SBox(encryptedText: encryptedText, nonce: nonce, tag: tag)
+    }
 }

@@ -10,27 +10,43 @@ import CryptoKit
 
 public extension AES.GCM {
     struct SBox: SealedBox {
-        public let cipherText: Data
         
+        /// CipherText + Tag
+        public var cipherText: Data { encryptedText + tag }
+        
+        public let encryptedText: Data
         private let sbox: CryptoKit.AES.GCM.SealedBox?
         private let nonce: Nonce
+        private let tag: Data
         
         init(cipherText: Data, nonce: Nonce) {
-            self.cipherText = cipherText
-            self.nonce = nonce
-            self.sbox = nil
+            self.init(
+                encryptedText: cipherText.dropLast(AES.blockSize),
+                nonce: nonce,
+                tag: cipherText.suffix(AES.blockSize)
+            )
         }
         
-        init(plainText: Data, key: AES.Key, nonce: Nonce) throws {
+        init(encryptedText: Data, nonce: Nonce, tag: Data) {
+            self.encryptedText = encryptedText
+            self.nonce = nonce
+            self.sbox = nil
+            self.tag = tag
+        }
+        
+        init(plainText: Data, key: AES.Key, nonce: Nonce, tag: Data? = nil) throws {
             self.nonce = nonce
             let ckNonce = nonce
-            self.sbox = try CryptoKit.AES.GCM.seal(plainText, using: key.ckKey, nonce: ckNonce) ~> AES.Error.cryptoKit(error:)
-            self.cipherText = sbox!.ciphertext
+            let sbox = try CryptoKit.AES.GCM.seal(plainText, using: key.ckKey, nonce: ckNonce, tag: tag) ~> AES.Error.cryptoKit(error:)
+            self.sbox = sbox
+            
+            self.encryptedText = sbox.ciphertext            
+            self.tag = sbox.tag
         }
         
         public func open(using key: AES.Key) throws -> Data {
             let aesKey = CryptoKit.SymmetricKey(data: key)
-            let sbox = try (sbox ?? .init(nonce: nonce, ciphertext: cipherText, tag: Data()))
+            let sbox = try (sbox ?? .init(nonce: nonce, ciphertext: cipherText.dropLast(AES.blockSize), tag: tag))
             return try CryptoKit.AES.GCM.open(sbox, using: aesKey) ~> AES.Error.cryptoKit(error:)
         }
     }
@@ -38,4 +54,14 @@ public extension AES.GCM {
 
 private extension AES.Key {
     var ckKey: CryptoKit.SymmetricKey { .init(data: self) }
+}
+
+private extension CryptoKit.AES.GCM {
+    static func seal<Plaintext, AuthenticatedData>(_ message: Plaintext, using key: CryptoKit.SymmetricKey, nonce: AES.GCM.Nonce? = nil, tag: AuthenticatedData?) throws -> CryptoKit.AES.GCM.SealedBox where Plaintext : DataProtocol, AuthenticatedData : DataProtocol {
+        if let tag {
+            try seal(message, using: key, nonce: nonce, authenticating: tag)
+        } else {
+            try seal(message, using: key, nonce: nonce)
+        }
+    }
 }
