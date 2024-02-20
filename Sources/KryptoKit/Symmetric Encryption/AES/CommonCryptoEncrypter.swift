@@ -64,10 +64,10 @@ final class CommonCryptoEncrypter {
             iv.bytes,
             key.bytes,
             key.length,
-            nil,
-            0,
-            0,
-            CCModeOptions(kCCOptionPKCS7Padding), // useless by doc
+            nil, // not used
+            0,   // not used
+            0,   // not used
+            0,   // not used
             &cryptor
         )
         
