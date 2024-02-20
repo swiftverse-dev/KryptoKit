@@ -20,30 +20,30 @@ final class CommonCryptoEncrypter {
         iv: Data? = nil,
         padding: CCPadding = CCPadding(ccPKCS7Padding)
     ) {
-        self._algo = algo
-        self._mode = mode
-        self._iv = iv
-        self._padding = padding
+        self.algo = algo
+        self.mode = mode
+        self.iv = iv
+        self.padding = padding
     }
     
-    private let _algo: CCAlgorithm
-    private let _mode: CCMode
-    private let _iv: Data?
-    private let _padding: CCPadding
+    private let algo: CCAlgorithm
+    private let mode: CCMode
+    private let iv: Data?
+    private let padding: CCPadding
     
     func encrypt(plainData: Data, using key: Data) throws -> Data {
-        try _applyOperation(data: plainData, operation: CCOperation(kCCEncrypt), key: key)
+        try applyOperation(data: plainData, operation: CCOperation(kCCEncrypt), key: key)
     }
     
     func decrypt(encryptedData: Data, using key: Data) throws -> Data {
-        try _applyOperation(data: encryptedData, operation: CCOperation(kCCDecrypt), key: key)
+        try applyOperation(data: encryptedData, operation: CCOperation(kCCDecrypt), key: key)
     }
     
-    func _applyOperation(data: Data, operation: CCOperation, key: Data) throws -> Data{
+    private func applyOperation(data: Data, operation: CCOperation, key: Data) throws -> Data{
         
         let key = key as NSData
         let data = data as NSData
-        let iv = (_iv ?? Data.init(bytes: [Int8](repeating: 0, count: key.count), count: key.count)) as NSData
+        let iv = (iv ?? Data.init(bytes: [Int8](repeating: 0, count: key.count), count: key.count)) as NSData
         
         var dataOutMoved: size_t = 0
         var dataOutMovedTotal: size_t = 0
@@ -58,9 +58,9 @@ final class CommonCryptoEncrypter {
         
         status = CCCryptorCreateWithMode(
             operation,
-            _mode,
-            _algo,
-            _padding,
+            mode,
+            algo,
+            padding,
             iv.bytes,
             key.bytes,
             key.length,

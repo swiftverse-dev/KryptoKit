@@ -29,7 +29,7 @@ public extension AES.CBC {
         
         public func open(using key: AES.Key) throws -> Data {
             let enc = Self.encrypter(iv: iv)
-            return try enc.decrypt(encryptedData: cipherText, using: key.data)
+            return try enc.decrypt(encryptedData: cipherText, using: key.data) ~> AES.Error.statusError
         }
     }
 }
