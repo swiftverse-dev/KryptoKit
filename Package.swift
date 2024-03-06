@@ -7,7 +7,7 @@ let package = Package(
     name: "KryptoKit",
     platforms: [
         .iOS(.v13),
-        .macOS(.v10_15),
+        .macOS(.v11),
         .watchOS(.v8),
         .tvOS(.v15)
     ],
@@ -17,11 +17,14 @@ let package = Package(
             name: "KryptoKit",
             targets: ["KryptoKit"]),
     ],
+    dependencies: [
+        .package(url: "https://github.com/swiftverse-dev/StorageKit.git", branch: "main")
+    ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "KryptoKit"),
+            name: "KryptoKit", dependencies: ["StorageKit"]),
         .testTarget(
             name: "KryptoKitTests",
             dependencies: ["KryptoKit"]),
