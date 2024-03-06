@@ -7,9 +7,9 @@
 
 import Foundation
 
-public protocol SealedBox<Key> {
-    associatedtype Key: SymmetricKey
+public protocol SealedBox<Algorithm> {
+    associatedtype Algorithm: SymmetricAlgorithm
     
-    func `open`(using key: Key) throws -> Data
+    func `open`(using key: any SymmetricKey<Algorithm>) throws -> Data
     var cipherText: Data { get }
 }

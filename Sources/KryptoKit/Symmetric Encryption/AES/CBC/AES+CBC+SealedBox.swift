@@ -18,7 +18,7 @@ public extension AES.CBC {
             self.iv = iv
         }
         
-        init(plainText: Data, key: AES.Key, iv: IV) throws {
+        init(plainText: Data, key: any SymmetricKey<AES>, iv: IV) throws {
             let enc = Self.encrypter(iv: iv)
             self.cipherText = try enc.encrypt(
                 plainData: plainText,
@@ -27,7 +27,7 @@ public extension AES.CBC {
             self.iv = iv
         }
         
-        public func open(using key: AES.Key) throws -> Data {
+        public func open(using key: any SymmetricKey<AES>) throws -> Data {
             let enc = Self.encrypter(iv: iv)
             return try enc.decrypt(encryptedData: cipherText, using: key.data) ~> AES.Error.statusError
         }

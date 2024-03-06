@@ -19,7 +19,7 @@ public extension AES.ECB{
             self.padding = padding
         }
         
-        init(plainText: Data, key: AES.Key, padding: Padding = .pkcs7) throws {
+        init(plainText: Data, key: any SymmetricKey<AES>, padding: Padding = .pkcs7) throws {
             self.padding = padding
             let enc = Self.encrypter(padding: padding)
             self.cipherText = try enc.encrypt(
@@ -28,7 +28,7 @@ public extension AES.ECB{
             ) ~> AES.Error.statusError
         }
         
-        public func open(using key: AES.Key) throws -> Data {
+        public func open(using key: any SymmetricKey<AES>) throws -> Data {
             let enc = Self.encrypter(padding: padding)
             return try enc.decrypt(encryptedData: cipherText, using: key.data) ~> AES.Error.statusError
         }

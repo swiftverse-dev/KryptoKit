@@ -34,7 +34,7 @@ public extension AES.GCM {
             self.tag = tag
         }
         
-        init(plainText: Data, key: AES.Key, nonce: Nonce, tag: Data? = nil) throws {
+        init(plainText: Data, key: any SymmetricKey<AES>, nonce: Nonce, tag: Data? = nil) throws {
             self.nonce = nonce
             let ckNonce = nonce
             let sbox = try CryptoKit.AES.GCM.seal(plainText, using: key.ckKey, nonce: ckNonce, tag: tag) ~> AES.Error.cryptoKit(error:)
@@ -44,7 +44,7 @@ public extension AES.GCM {
             self.tag = sbox.tag
         }
         
-        public func open(using key: AES.Key) throws -> Data {
+        public func open(using key: any SymmetricKey<AES>) throws -> Data {
             let aesKey = CryptoKit.SymmetricKey(data: key)
             let sbox = try (sbox ?? .init(nonce: nonce, ciphertext: cipherText.dropLast(AES.blockSize), tag: tag))
             return try CryptoKit.AES.GCM.open(sbox, using: aesKey) ~> AES.Error.cryptoKit(error:)
@@ -52,7 +52,7 @@ public extension AES.GCM {
     }
 }
 
-private extension AES.Key {
+private extension SymmetricKey {
     var ckKey: CryptoKit.SymmetricKey { .init(data: self) }
 }
 

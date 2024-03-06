@@ -11,57 +11,57 @@ import KryptoKit
  class AESTests: XCTestCase {
 
      func assert_sealedBoxFromCipherText_createSealedBoxWithTheSameCipherText(
-        sut: any SymmetricEncrypter<AES.Key>,
+        sut: any SymmetricEncrypter<AES>,
         file: StaticString = #filePath,
         line: UInt = #line
      ) throws {
          let cipherText = Data("cipherText".utf8)
-         let sbox = sut.sealedBox(fromCipherText: cipherText)
+         let sbox = sut.opaqueSealedBox(fromCipherText: cipherText)
          XCTAssertEqual(sbox.cipherText, cipherText, file: file, line: line)
      }
      
      func assert_seal_createsSealedBoxWithCorrectCipherText(
-        sut: any SymmetricEncrypter<AES.Key>,
+        sut: any SymmetricEncrypter<AES>,
         file: StaticString = #filePath,
         line: UInt = #line
      ) throws {
-         let sbox128 = try sut.seal(plainText: plainText, using: k128)
+         let sbox128 = try sut.opaqueSeal(plainText: plainText, using: k128)
          XCTAssertEqual(sbox128.cipherText, cipherText128, file: file, line: line)
          
-         let sbox192 = try sut.seal(plainText: plainText, using: k192)
+         let sbox192 = try sut.opaqueSeal(plainText: plainText, using: k192)
          XCTAssertEqual(sbox192.cipherText, cipherText192, file: file, line: line)
          
-         let sbox256 = try sut.seal(plainText: plainText, using: k256)
+         let sbox256 = try sut.opaqueSeal(plainText: plainText, using: k256)
          XCTAssertEqual(sbox256.cipherText, cipherText256, file: file, line: line)
      }
      
      func assert_openSealedBox_extractsTheCorrectPlainText(
-        sut: any SymmetricEncrypter<AES.Key>,
+        sut: any SymmetricEncrypter<AES>,
         file: StaticString = #filePath,
         line: UInt = #line
      ) throws {
-         let sbox128 = sut.sealedBox(fromCipherText: cipherText128)
+         let sbox128 = sut.opaqueSealedBox(fromCipherText: cipherText128)
          try XCTAssertEqual(sbox128.open(using: k128), plainText, file: file, line: line)
          
-         let sbox92 = sut.sealedBox(fromCipherText: cipherText192)
+         let sbox92 = sut.opaqueSealedBox(fromCipherText: cipherText192)
          try XCTAssertEqual(sbox92.open(using: k192), plainText, file: file, line: line)
          
-         let sbox256 = sut.sealedBox(fromCipherText: cipherText256)
+         let sbox256 = sut.opaqueSealedBox(fromCipherText: cipherText256)
          try XCTAssertEqual(sbox256.open(using: k256), plainText, file: file, line: line)
      }
      
      func assert_openSealedBox_returnsTheSamePlainTextUsedToCreateTheBox(
-        sut: any SymmetricEncrypter<AES.Key>,
+        sut: any SymmetricEncrypter<AES>,
         file: StaticString = #filePath,
         line: UInt = #line
      ) throws {
-         let sbox128 = try sut.seal(plainText: plainText, using: k128)
+         let sbox128 = try sut.opaqueSeal(plainText: plainText, using: k128)
          try XCTAssertEqual(sbox128.open(using: k128), plainText, file: file, line: line)
          
-         let sbox192 = try sut.seal(plainText: plainText, using: k192)
+         let sbox192 = try sut.opaqueSeal(plainText: plainText, using: k192)
          try XCTAssertEqual(sbox192.open(using: k192), plainText, file: file, line: line)
          
-         let sbox256 = try sut.seal(plainText: plainText, using: k256)
+         let sbox256 = try sut.opaqueSeal(plainText: plainText, using: k256)
          try XCTAssertEqual(sbox256.open(using: k256), plainText, file: file, line: line)
      }
 }

@@ -15,7 +15,7 @@ final class SecureRandomTests: XCTestCase {
         let nonConvertibleToByteSizes: [UInt] = [1, 2, 10, 11, 100, 101]
         
         nonConvertibleToByteSizes.forEach{ bitSize in
-            expect(toThrow: .badSize) { try SUT.generate(bitSize: bitSize) }
+            expect(toThrow: .badSize) { _ = try SUT.generate(bitSize: bitSize) }
         }
     }
     
